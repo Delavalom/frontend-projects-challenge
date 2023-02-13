@@ -1,11 +1,12 @@
 import { useState } from 'react'
+import { Navbar } from './components/Navbar/Navbar'
 
 function App() {
   const [count, setCount] = useState(0)
 
   return (
     <main className='w-full h-screen'>
-      <h1>hello</h1>
+      <Navbar />
     </main>
   )
 }
