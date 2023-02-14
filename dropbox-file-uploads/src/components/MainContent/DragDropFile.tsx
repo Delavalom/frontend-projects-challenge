@@ -1,4 +1,4 @@
-import { useState, type FC, useRef, ReactNode } from "react";
+import { useState, type FC, useRef, ReactNode, ChangeEvent, DragEventHandler, DragEvent } from "react";
 
 type Props = {
   children: ReactNode;
@@ -7,8 +7,13 @@ type Props = {
 export const DragDropFile: FC<Props> = ({ children }) => {
   const [dragActive, setDragActive] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const [files, setFiles] = useState<File[] | null>(null)
 
-  const handleDrag = (e: any) => {
+  const handleFiles = (files: FileList) => {
+
+  }
+
+  const handleDrag = (e: DragEvent<HTMLElement>) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.type === "dragenter" || e.type === "dragover") {
@@ -18,19 +23,19 @@ export const DragDropFile: FC<Props> = ({ children }) => {
     }
   };
   // triggers when file is dropped
-  const handleDrop = (e: any) => {
+  const handleDrop = (e: DragEvent<HTMLInputElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
     if (e.dataTransfer?.files && e.dataTransfer?.files[0]) {
-      // handleFiles(e.dataTransfer.files);
+      handleFiles(e.dataTransfer.files);
     }
   };
   // triggers when file is selected with click
-  const handleChange = (e: any) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     if (e.target.files && e.target.files[0]) {
-      // handleFiles(e.target.files);
+      handleFiles(e.target.files);
     }
   };
 
