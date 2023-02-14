@@ -1,42 +1,51 @@
-import { useState, type FC, useRef, ReactNode, ChangeEvent, DragEventHandler, DragEvent } from "react";
+import {
+  type FC,
+  useRef,
+  ReactNode,
+  ChangeEvent,
+  DragEvent,
+  useContext,
+} from "react";
+import { UploadContext } from "../../context/UploadContext";
 
 type Props = {
   children: ReactNode;
 };
 
 export const DragDropFile: FC<Props> = ({ children }) => {
-  const [dragActive, setDragActive] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [files, setFiles] = useState<File[] | null>(null)
-
-  const handleFiles = (files: FileList) => {
-
-  }
+  const upload = useContext(UploadContext);
 
   const handleDrag = (e: DragEvent<HTMLElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
+    upload?.dispatch({
+      type: "drag",
+      payload: {
+        e,
+      },
+    });
   };
   // triggers when file is dropped
   const handleDrop = (e: DragEvent<HTMLInputElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    setDragActive(false);
-    if (e.dataTransfer?.files && e.dataTransfer?.files[0]) {
-      handleFiles(e.dataTransfer.files);
-    }
+    upload?.dispatch({
+      type: "drop",
+      payload: {
+        e,
+      },
+    });
   };
   // triggers when file is selected with click
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
-    if (e.target.files && e.target.files[0]) {
-      handleFiles(e.target.files);
-    }
+    upload?.dispatch({
+      type: "change",
+      payload: {
+        e,
+      },
+    });
   };
 
   const onButtonClick = () => {
@@ -49,7 +58,9 @@ export const DragDropFile: FC<Props> = ({ children }) => {
       onSubmit={(e) => e.preventDefault()}
       onDragEnter={handleDrag}
       className={`w-full h-full flex p-4 flex-col gap-2 ${
-        dragActive ? "border-4 border-dashed border-slate-800" : ""
+        upload?.files.isDragActive
+          ? "border-4 border-dashed border-slate-800"
+          : ""
       }`}
     >
       <input
@@ -68,7 +79,7 @@ export const DragDropFile: FC<Props> = ({ children }) => {
         Upload File
       </button>
       <label htmlFor="input-file-upload">
-        {dragActive && (
+        {upload?.files.isDragActive && (
           <section
             id="drag-file-element"
             onDragEnter={handleDrag}

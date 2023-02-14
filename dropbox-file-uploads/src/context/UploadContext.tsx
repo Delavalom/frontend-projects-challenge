@@ -1,4 +1,11 @@
-import { ChangeEvent, DragEvent, createContext } from "react";
+import {
+  ChangeEvent,
+  Dispatch,
+  DragEvent,
+  ReactNode,
+  createContext,
+  useReducer,
+} from "react";
 import { getFilesFromFileList } from "../utils/utils";
 
 type State = {
@@ -38,7 +45,22 @@ type Action =
       };
     };
 
-const UploadContext = createContext(null);
+export const UploadContext = createContext<{
+  files: State;
+  dispatch: Dispatch<Action>;
+} | null >(null);
+
+export const UploadProvider = ({ children }: { children: ReactNode }) => {
+  const [files, dispatch] = useReducer(UploadReducer, {
+    isDragActive: false,
+    files: [],
+  });
+  return (
+    <UploadContext.Provider value={{ files, dispatch }}>
+      {children}
+    </UploadContext.Provider>
+  );
+};
 
 export const UploadReducer = (state: State, action: Action): State => {
   switch (action.type) {
@@ -63,10 +85,11 @@ export const UploadReducer = (state: State, action: Action): State => {
         action.payload.e.dataTransfer?.files &&
         action.payload.e.dataTransfer?.files[0]
       ) {
-        const files = getFilesFromFileList(action.payload.e.dataTransfer.files)
+        const files = getFilesFromFileList(action.payload.e.dataTransfer.files);
+        const stateFiles = state.files.slice();
         return {
           isDragActive: false,
-          files,
+          files: [...stateFiles, ...files],
         };
       }
       return {
@@ -74,31 +97,17 @@ export const UploadReducer = (state: State, action: Action): State => {
         isDragActive: false,
       };
     }
-    case "change":
-      {
-        if (action.payload.e.target.files && action.payload.e.target.files[0]) {
-            const files = getFilesFromFileList(action.payload.e.target.files)
-          return {
-            ...state,
-            files,
-          };
-        }
+    case "change": {
+      if (action.payload.e.target.files && action.payload.e.target.files[0]) {
+        const files = getFilesFromFileList(action.payload.e.target.files);
+        const stateFiles = state.files.slice();
+        return {
+          ...state,
+          files: [...stateFiles, ...files],
+        };
       }
+    }
     default:
-      throw new Error('Invalid type selected');
+      throw new Error("Invalid type selected");
   }
-};
-
-const handleDrag = (e: any) => {
-  e.preventDefault();
-  e.stopPropagation();
-};
-// triggers when file is dropped
-const handleDrop = (e: DragEvent<HTMLInputElement>) => {
-  e.preventDefault();
-  e.stopPropagation();
-};
-// triggers when file is selected with click
-const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-  e.preventDefault();
 };

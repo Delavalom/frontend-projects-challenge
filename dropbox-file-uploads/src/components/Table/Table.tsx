@@ -1,13 +1,15 @@
-import { type FC } from "react";
+import { useContext, type FC } from "react";
 import { SearchBar } from "./SearchBar";
 import { TableCheckbox } from "./TableCheckbox";
 import { TableHeaderElement } from "./TableHeaderElement";
 import { TableDataElement } from "./TableDataElement";
 import { TableRow } from "./TableRow";
+import { UploadContext } from "../../context/UploadContext";
 
 type Props = {};
 
 export const Table: FC<Props> = ({}) => {
+  const upload = useContext(UploadContext);
   return (
     <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
       <SearchBar />
@@ -22,24 +24,15 @@ export const Table: FC<Props> = ({}) => {
           </TableRow>
         </thead>
         <tbody>
-          <TableRow>
-            <TableCheckbox />
-            <TableHeaderElement scope="row">
-              Employees Data
-            </TableHeaderElement>
-            <TableDataElement>.txt</TableDataElement>
-            <TableDataElement>2mb</TableDataElement>
-            <TableDataElement href="#">Delete </TableDataElement>
-          </TableRow>
-          <TableRow>
-            <TableCheckbox />
-            <TableHeaderElement scope="row">
-              Income Data
-            </TableHeaderElement>
-            <TableDataElement>.txt</TableDataElement>
-            <TableDataElement>1mb</TableDataElement>
-            <TableDataElement href="#">Delete</TableDataElement>
-          </TableRow>
+          {upload?.files.files.map((file, idx) => (
+            <TableRow key={idx}>
+              <TableCheckbox />
+              <TableHeaderElement scope="row">{file.name}</TableHeaderElement>
+              <TableDataElement>{file.type}</TableDataElement>
+              <TableDataElement>{`${(file.size / 1024).toFixed()} Kb`}</TableDataElement>
+              <TableDataElement href="#">Delete</TableDataElement>
+            </TableRow>
+          ))}
         </tbody>
       </table>
     </div>
