@@ -1,7 +1,8 @@
-import { ReactElement, type FC } from "react";
+import { type FC } from "react";
+import { RadioType } from "./Radio";
 
 type Props = {
-  Radio: ReactElement
+  Radio: RadioType
   value?: string
   onClick?: () => void
   direction?: "row" | "column"
@@ -11,11 +12,12 @@ type Props = {
   onError?: string
 };
 
-export const RadioCard: FC<Props> = ({Radio}) => {
+export const RadioCard: FC<Props> = ({Radio, value, onClick}) => {
+  const handler = onClick ? onClick : () => null
   return (
-
     <label>
-      <Radio />
+      {value}
+      <Radio onChange={() => handler} isChecked />
     </label>
   )
 };

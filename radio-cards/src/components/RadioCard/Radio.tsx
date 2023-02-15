@@ -1,12 +1,12 @@
-import { type FC } from 'react';
+import { type FC } from "react";
 
-type Props = {};
+type Props = {
+  onChange: () => {};
+  isChecked: boolean
+};
 
-export const Radio: FC<Props> = ({}) => {
+export type RadioType = typeof Radio
 
-  return (
-        <section className="">
-          Radio
-        </section>
-  );
+export const Radio: FC<Props> = ({ onChange, isChecked }) => {
+  return <input type="checkbox" checked={isChecked} onChange={onChange} />;
 };
